@@ -26,7 +26,7 @@ const LogIn = () => {
             if(response.ok){
                 console.log(response.ok);
                 
-                // navigate('/dashboard', { replace: true });
+                navigate('/dashboard', { replace: true });
                 
             }else{
                 alert("wrong input");
