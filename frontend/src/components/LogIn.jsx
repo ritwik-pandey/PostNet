@@ -8,14 +8,14 @@ const LogIn = () => {
     })
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: e.target.value})
+        setFormData({ ...formData, [e.target.name]: e.target.value })
     }
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try{
+        try {
             const response = await fetch('http://localhost:5000/login', {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
@@ -23,40 +23,46 @@ const LogIn = () => {
                 credentials: 'include',
             })
 
-            if(response.ok){
+            if (response.ok) {
                 console.log(response.ok);
-                
+
                 navigate('/dashboard', { replace: true });
-                
-            }else{
+
+            } else {
                 alert("wrong input");
             }
-        }catch(e){
+        } catch (e) {
             console.log(e);
-            
+
         }
     };
 
     return (
-        <>
-        <form onSubmit={handleSubmit}>
-            <input name="email" 
-                type="email" 
-                className='input'
-                placeholder='email'
-                onChange={handleChange}
-            />
+        <div className="auth-container">
+            <div className="auth-card">
+                <h2>Welcome Back</h2>
+                <p>Enter your details to access your account</p>
+                <form onSubmit={handleSubmit}>
+                    <input name="email"
+                        type="email"
+                        className='input'
+                        placeholder='Email Address'
+                        onChange={handleChange}
+                        required
+                    />
 
-            <input name="password" 
-                type="password" 
-                className='input'
-                placeholder='password'
-                onChange={handleChange}
-            />
+                    <input name="password"
+                        type="password"
+                        className='input'
+                        placeholder='Password'
+                        onChange={handleChange}
+                        required
+                    />
 
-            <button type="submit">Log in</button>
-        </form>
-        </>
+                    <button type="submit">Log in</button>
+                </form>
+            </div>
+        </div>
     )
 }
 

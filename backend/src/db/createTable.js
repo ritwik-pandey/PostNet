@@ -11,9 +11,19 @@ const createTableQuery = `
   );
 `;
 
+const createPostTable = `
+  CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    content VARCHAR(100) NOT NULL,
+    user_id INT REFERENCES users(id),
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
+  );
+`;
+
 async function createTable() {
   try {
-    await pool.query(createTableQuery);
+    await pool.query(createPostTable);
     console.log(' "users" table created successfully or already exists.');
   } catch (err) {
     console.error('Error creating the table:', err);
