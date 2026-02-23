@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const loginRoutes = require('./src/routes/login')
 const signupRoutes = require('./src/routes/signup')
 const postRoutes = require('./src/routes/post')
+const commentRoutes = require('./src/routes/comments')
 
 const port = 5000
 
@@ -26,6 +27,7 @@ const authMiddleWare = require('./src/middleware/auth')
 app.use('/login',loginRoutes);
 app.use('/signup',signupRoutes);
 app.use('/', postRoutes);
+app.use('/', commentRoutes);
 
 app.get('/dashboard', authMiddleWare,(req, res) => {
   console.log(req.user);

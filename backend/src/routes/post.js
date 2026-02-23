@@ -32,7 +32,8 @@ router.get('/posts', authMiddleWare, async (req,res) => {
                 posts.id AS post_id, 
                 posts.title, 
                 posts.content, 
-                users.name AS author_name 
+                users.name AS author_name,
+                user_id
             FROM posts
             JOIN users ON posts.user_id = users.id
             ORDER BY posts.id DESC;
@@ -52,7 +53,12 @@ router.get('/posts', authMiddleWare, async (req,res) => {
 router.get('/posts/:id', authMiddleWare, async (req,res) => {
     try{
         const id = req.params.id;
-        const query = `SELECT * FROM posts WHERE id=${id}`
+        const query = `SELECT 
+        posts.*, 
+        users.name AS author_name 
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        WHERE posts.id = ${id};`
         const responseData = await pool.query(query)
         const jsonContent = JSON.stringify(responseData.rows);
         res.end(jsonContent);
@@ -60,5 +66,7 @@ router.get('/posts/:id', authMiddleWare, async (req,res) => {
         console.log(e);     
     }
 })
+
+
 
 module.exports = router;

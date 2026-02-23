@@ -21,9 +21,39 @@ const createPostTable = `
   );
 `;
 
+const createCommentsTable = `
+  CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    content VARCHAR(100) NOT NULL,
+    user_id INT REFERENCES users(id),
+    post_id INT REFERENCES posts(id),
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
+  );
+`;
+
+const createVotesTable = `
+  CREATE TABLE IF NOT EXISTS votes (
+    user_id INT REFERENCES users(id),
+    post_id INT REFERENCES posts(id),
+    vote_type INT,
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (user_id, post_id)
+  );
+`;
+
+const createCommentsVotesTable = `
+  CREATE TABLE IF NOT EXISTS commentsVotes (
+    user_id INT REFERENCES users(id),
+    comment_id INT REFERENCES comments(id),
+    vote_type INT,
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (user_id, comment_id)
+  );
+`;
+
 async function createTable() {
   try {
-    await pool.query(createPostTable);
+    await pool.query(createCommentsVotesTable);
     console.log(' "users" table created successfully or already exists.');
   } catch (err) {
     console.error('Error creating the table:', err);
