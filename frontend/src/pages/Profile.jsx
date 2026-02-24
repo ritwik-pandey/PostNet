@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import FollowListModal from '../components/FollowListModal';
 import './Profile.css';
 
 const GetProfile = () => {
     const { id } = useParams();
     const [userData, setUserData] = useState([]);
     const [posts, setPosts] = useState([]);
+
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalList, setModalList] = useState([]);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -65,6 +71,42 @@ const GetProfile = () => {
         }
     };
 
+    const getFollowing = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/${id}/following`, {
+                method: "GET",
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const res = await response.json();
+                setModalTitle('Following');
+                setModalList(res);
+                setIsModalOpen(true);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const getFollowers = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/${id}/followers`, {
+                method: "GET",
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const res = await response.json();
+                setModalTitle('Followers');
+                setModalList(res);
+                setIsModalOpen(true);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
         <div className="dashboard-container">
             <Navbar />
@@ -103,9 +145,15 @@ const GetProfile = () => {
                                 <p className="profile-handle">@{userData.name?.toLowerCase().replace(/\s+/g, '')}</p>
 
                                 <div className="profile-stats">
-                                    <div className="stat-item"><span>{userData.total_following || 0}</span> Following</div>
-                                    <div className="stat-item"><span>{userData.total_followers || 0}</span> Followers</div>
-                                    <div className="stat-item"><span>{userData.total_posts || 0}</span> Posts</div>
+                                    <div className="stat-item clickable" onClick={getFollowing}>
+                                        <span>{userData.total_following || 0}</span> Following
+                                    </div>
+                                    <div className="stat-item clickable" onClick={getFollowers}>
+                                        <span>{userData.total_followers || 0}</span> Followers
+                                    </div>
+                                    <div className="stat-item">
+                                        <span>{userData.total_posts || 0}</span> Posts
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -128,6 +176,13 @@ const GetProfile = () => {
                     </div>
                 </section>
             </main>
+
+            <FollowListModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={modalTitle}
+                list={modalList}
+            />
         </div>
     );
 };

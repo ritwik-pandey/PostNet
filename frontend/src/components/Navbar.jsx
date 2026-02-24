@@ -49,6 +49,12 @@ const Navbar = () => {
                 </div>
                 <Link to="/create-post"><button className="post-btn-main">Post</button></Link>
             </div>
+
+            <div className="navbar-bottom">
+                <Link to="/logout" className="nav-item logout-item">
+                    <span className="nav-text">Logout</span>
+                </Link>
+            </div>
         </nav>
     );
 };

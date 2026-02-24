@@ -86,6 +86,16 @@
     color: #71767b;
 }
 
+.stat-item.clickable {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.stat-item.clickable:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
 .stat-item span {
     color: #fff;
     font-weight: 700;

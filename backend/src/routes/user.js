@@ -106,4 +106,41 @@ router.get('/getid',authMiddleWare, async (req,res) => {
     res.send({id: id});
 })
 
+router.get('/:id/followers', authMiddleWare, async(req,res) => {
+    const id = req.params.id;
+    const query = `
+        SELECT 
+            f.follower_id, 
+            u.name AS follower_name, 
+            f.created_at AS followed_on
+        FROM follows f
+        JOIN users u ON f.follower_id = u.id
+        WHERE f.following_id = $1;
+        `;
+    const responseData = await pool.query(query,[id])
+    res.send(responseData.rows);
+    
+})
+
+router.get('/:id/following', authMiddleWare, async(req,res) => {
+    const id = req.params.id;
+    const query = `
+        SELECT 
+            f.following_id, 
+            u.name AS following_name, 
+            f.created_at AS followed_on
+        FROM follows f
+        JOIN users u ON f.following_id = u.id
+        WHERE f.follower_id = $1;
+        `;
+    const responseData = await pool.query(query,[id])
+    res.send(responseData.rows);
+    
+})
+
+router.get('/logout', authMiddleWare, async(req,res) => {
+    res.clearCookie();
+    res.send("");
+})
+
 module.exports = router;

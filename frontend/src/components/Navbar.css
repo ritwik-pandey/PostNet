@@ -99,6 +99,22 @@
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
 }
 
+.navbar-bottom {
+    margin-top: auto;
+    padding-bottom: 20px;
+}
+
+.logout-item {
+    color: #ef4444 !important;
+    /* Red color for logout */
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1280px) {
     .navbar {
