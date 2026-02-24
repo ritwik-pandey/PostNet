@@ -26,7 +26,6 @@ router.post('/', async (req, res) => {
     console.log(res.rows[0]);    
   }catch(err){
     console.log(err.stack);
-    
   }
 
   

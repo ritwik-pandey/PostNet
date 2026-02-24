@@ -9,6 +9,7 @@ const loginRoutes = require('./src/routes/login')
 const signupRoutes = require('./src/routes/signup')
 const postRoutes = require('./src/routes/post')
 const commentRoutes = require('./src/routes/comments')
+const userRoute = require('./src/routes/user')
 
 const port = 5000
 
@@ -28,6 +29,7 @@ app.use('/login',loginRoutes);
 app.use('/signup',signupRoutes);
 app.use('/', postRoutes);
 app.use('/', commentRoutes);
+app.use('/', userRoute)
 
 app.get('/dashboard', authMiddleWare,(req, res) => {
   console.log(req.user);

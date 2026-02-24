@@ -51,9 +51,18 @@ const createCommentsVotesTable = `
   );
 `;
 
+const createFollows = `
+  CREATE TABLE IF NOT EXISTS follows (
+    follower_id INT REFERENCES users(id),
+    following_id INT REFERENCES users(id),
+    created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (follower_id, following_id)
+  );
+`;
+
 async function createTable() {
   try {
-    await pool.query(createCommentsVotesTable);
+    await pool.query(createFollows);
     console.log(' "users" table created successfully or already exists.');
   } catch (err) {
     console.error('Error creating the table:', err);
