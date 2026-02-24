@@ -38,29 +38,77 @@ const LogIn = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h2>Welcome Back</h2>
-                <p>Enter your details to access your account</p>
-                <form onSubmit={handleSubmit}>
-                    <input name="email"
-                        type="email"
-                        className='input'
-                        placeholder='Email Address'
-                        onChange={handleChange}
-                        required
-                    />
+        <div className="login-container">
+            <div className="login-left">
+                <div className="quote-container">
+                    <p className="wise-quote">Document your life</p>
+                    <div className="quote-line"></div>
+                </div>
+                <div className="bottom-text">
+                    <h1>Get Everything You Want</h1>
+                    <p>Explore, Follow, write, Enjoy!</p>
+                </div>
+            </div>
+            <div className="login-right">
+                <div className="brand-header">
+                    <div className="brand-logo">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="logo-svg">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </div>
+                    <span className="brand-name">PostNet</span>
+                </div>
 
-                    <input name="password"
-                        type="password"
-                        className='input'
-                        placeholder='Password'
-                        onChange={handleChange}
-                        required
-                    />
+                <div className="form-wrapper">
+                    <h2>Welcome Back</h2>
+                    <p className="subtitle">Enter your email and password to access your account</p>
 
-                    <button type="submit">Log in</button>
-                </form>
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <label>Email</label>
+                            <input
+                                name="email"
+                                type="email"
+                                className='login-input'
+                                placeholder='Enter your email'
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Password</label>
+                            <div className="password-wrapper">
+                                <input
+                                    name="password"
+                                    type="password"
+                                    className='login-input'
+                                    placeholder='Enter your password'
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <button type="button" className="toggle-password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="eye-icon">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        
+
+                        <button type="submit" className="sign-in-btn">Sign In</button>
+
+                        
+                    </form>
+
+                    <p className="signup-prompt">
+                        Don't have an account? <a href="/signup">Sign Up</a>
+                    </p>
+                </div>
             </div>
         </div>
     )

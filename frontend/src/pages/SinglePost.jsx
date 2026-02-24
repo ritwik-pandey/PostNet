@@ -50,8 +50,8 @@ const GetPost = () => {
                 });
 
                 if(response.ok){
-                    const data = await response.json();
-                    setPost(data);                            
+                    const data = await response.json();                    
+                    setPost(data[0]);                            
                 }else{
                 }
             }catch(e){
@@ -69,7 +69,8 @@ const GetPost = () => {
 
                 if(response.ok){
                     const data = await response.json(); 
-                                       
+                    console.log(data);
+                                 
                     setComment(data);                            
                 }else{
                 }
@@ -83,7 +84,7 @@ const GetPost = () => {
 
     },[]);
 
-    const handleClick = async (value, commentId) => {
+    const handleClick = async (value, commentId, total_votes) => {
         
         let voteType="";
         if(value > 0){
@@ -97,13 +98,21 @@ const GetPost = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     voteType: voteType, 
-                    commentId: commentId 
+                    commentId: commentId ,
+                    total_votes: total_votes
                 }),                    
                 credentials: 'include',
             })
 
             if(response.ok){
-                alert("S");
+                const res = await response.json();
+                setComment(prevComments => 
+                prevComments.map(c => 
+                    c.id === commentId 
+                        ? { ...c, total_votes: Number(res) } 
+                        : c 
+                )
+            );
             }
         }catch(e){
             console.log(e);
@@ -112,7 +121,7 @@ const GetPost = () => {
 
     }
 
-    const handleClickPost = async (value) => {
+    const handleClickPost = async (value, total_votes) => {
         let voteType="";
         if(value > 0){
             voteType="Like";
@@ -125,12 +134,20 @@ const GetPost = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     voteType: voteType, 
+                    total_votes: total_votes
                 }),                    
                 credentials: 'include',
             })
 
             if(response.ok){
-                alert("S");
+                const data = await response.json();
+                
+                
+                setPost(prevPost => ({
+                ...prevPost,
+                total_votes: Number(data)
+            }));
+                
             }
         }catch(e){
             console.log(e);
@@ -142,22 +159,24 @@ const GetPost = () => {
         <div>
             <h1>Posts</h1>
             
-            {post.map((post) => (
-                <div key={post.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
-                    <h2>{post.title}</h2>
-                    <p>{post.content}</p>
-                    <p>{post.author_name}</p>
-                    <button onClick={() => handleClickPost(1)}>Upvote</button>
-                    <button onClick={() => handleClickPost(-1)}>Downvote</button>
-                </div>
-            ))}
+            
+            <div key={post.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
+                <h2>{post.title}</h2>
+                <p>{post.content}</p>
+                <p>{post.author_name}</p>
+                <p>{post.total_votes}</p>
+                <button onClick={() => handleClickPost(1,post.total_votes)}>Upvote</button>
+                <button onClick={() => handleClickPost(-1, post.total_votes)}>Downvote</button>
+            </div>
+            
 
             {comment.map((comment) => (
 
                 <div key={comment.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
                     <p>{comment.content}</p>
-                    <button onClick={() => handleClick(1,comment.id)}>Upvote</button>
-                    <button onClick={() => handleClick(-1, comment.id)}>Downvote</button>
+                    <p>{comment.total_votes}</p>
+                    <button onClick={() => handleClick(1,comment.id,comment.total_votes)}>Upvote</button>
+                    <button onClick={() => handleClick(-1, comment.id,comment.total_votes)}>Downvote</button>
                 </div>
             ))}
 

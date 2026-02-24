@@ -30,12 +30,17 @@ router.get('/posts/:id/comments', authMiddleWare, async (req,res)=>{
     try{
         const query = `SELECT 
             comments.*, 
-            users.name AS author_name 
+            users.name AS author_name,
+            (
+                SELECT COALESCE(SUM(vote_type), 0) 
+                FROM commentsvotes 
+                WHERE commentsvotes.comment_id = comments.id
+            ) AS total_votes
             FROM comments
             JOIN users ON comments.user_id = users.id
             WHERE comments.post_id = ${post_id};`
         const responseData = await pool.query(query)
-        const jsonContent = JSON.stringify(responseData.rows);
+        const jsonContent = JSON.stringify(responseData.rows);        
         res.end(jsonContent);
     }catch(e){
         console.log(e);
@@ -51,6 +56,7 @@ router.post('/posts/:id/vote', authMiddleWare, async (req,res)=>{
     const id = req.params.id;
     const user_id = req.user.id;
     let vote = 0;
+    let total_votes = req.body.total_votes;
     if(content === "Like"){
         vote++;
     }else{
@@ -72,14 +78,21 @@ router.post('/posts/:id/vote', authMiddleWare, async (req,res)=>{
         `
         const values = [user_id, commentId, vote];
         const resp = await pool.query(insertQuery, values);
-        const jC = JSON.stringify(resp.rows);        
+        const jC = JSON.stringify(resp.rows);  
+        total_votes = Number(total_votes) + Number(vote);
     }else{
         vote=0;
         const query = `DELETE FROM commentsvotes WHERE comment_id=${commentId} AND user_id=${user_id}`
         const responseData = await pool.query(query);
+        const result = await pool.query(
+            `SELECT COALESCE(SUM(vote_type), 0) AS total_votes FROM commentsvotes WHERE comment_id = $1 `, 
+            [commentId]
+        );
+        total_votes = result.rows[0].total_votes;
+
     }
     
-    res.send("");
+    res.end(total_votes.toString());
 })
 
 router.post('/posts/:id/Postvote', authMiddleWare, async (req,res)=>{
@@ -87,6 +100,7 @@ router.post('/posts/:id/Postvote', authMiddleWare, async (req,res)=>{
     const content = req.body.voteType;
     const id = req.params.id;
     const user_id = req.user.id;
+    let total_votes = req.body.total_votes;
     let vote = 0;
     if(content === "Like"){
         vote++;
@@ -109,13 +123,19 @@ router.post('/posts/:id/Postvote', authMiddleWare, async (req,res)=>{
         `
         const values = [user_id, id, vote];
         const resp = await pool.query(insertQuery, values);
-        const jC = JSON.stringify(resp.rows);        
+        const jC = JSON.stringify(resp.rows);   
+        total_votes = Number(total_votes) + Number(vote);
     }else{
         vote=0;
-        const query = `DELETE FROM votes WHERE post_id=${id} AND user_id=${user_id}`
-        const responseData = await pool.query(query);
+        await pool.query(`DELETE FROM votes WHERE post_id = $1 AND user_id = $2`, [id, user_id]);
+         const result = await pool.query(
+            `SELECT COALESCE(SUM(vote_type), 0) AS total_votes FROM votes WHERE post_id = $1`, 
+            [id]
+        );
+        total_votes = result.rows[0].total_votes;
+        
     }
     
-    res.send("");
+    res.end(total_votes.toString());
 })
 module.exports = router;

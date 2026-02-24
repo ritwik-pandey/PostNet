@@ -51,20 +51,28 @@ router.get('/posts', authMiddleWare, async (req,res) => {
 })
 
 router.get('/posts/:id', authMiddleWare, async (req,res) => {
-    try{
-        const id = req.params.id;
-        const query = `SELECT 
+   
+
+    const query = `
+    SELECT 
         posts.*, 
-        users.name AS author_name 
+        users.name AS author_name,
+        
+        COALESCE((SELECT SUM(vote_type) FROM votes WHERE post_id = posts.id), 0) AS total_votes,
+        
+        EXISTS (SELECT 1 FROM votes WHERE post_id = posts.id AND user_id = $2) AS liked
+        
         FROM posts
         JOIN users ON posts.user_id = users.id
-        WHERE posts.id = ${id};`
-        const responseData = await pool.query(query)
-        const jsonContent = JSON.stringify(responseData.rows);
-        res.end(jsonContent);
-    }catch(e){
-        console.log(e);     
-    }
+        WHERE posts.id = $1;
+    `;
+
+    const current_user_id = req.user.id;
+    const post_id = req.params.id;
+
+    const responseData = await pool.query(query, [post_id, current_user_id]);
+
+    res.json(responseData.rows);
 })
 
 
