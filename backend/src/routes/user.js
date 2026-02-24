@@ -101,4 +101,9 @@ router.get('/', authMiddleWare, async (req,res) => {
     
 })
 
+router.get('/getid',authMiddleWare, async (req,res) => {
+    const id = req.user.id;
+    res.send({id: id});
+})
+
 module.exports = router;

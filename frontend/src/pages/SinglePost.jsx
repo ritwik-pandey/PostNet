@@ -1,202 +1,207 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import './SinglePost.css';
 
 const GetPost = () => {
-    const [post,setPost] = useState([])
-    const [comment, setComment] = useState([])
-    
-    const { id } = useParams(); 
-    
-     const [formData, setFormData] = useState({
-        
+    const [post, setPost] = useState([]);
+    const [comment, setComment] = useState([]);
+    const { id } = useParams();
+
+    const [formData, setFormData] = useState({
         content: ''
-    })
+    });
 
     const handleChange = (e) => {
-        setFormData({...formData, [e.target.name]: [e.target.value]})
-    }
-    
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
     const createComment = async (e) => {
         e.preventDefault();
-        try{
+        try {
             const response = await fetch(`http://localhost:5000/${id}/comment`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),                    
+                body: JSON.stringify(formData),
                 credentials: 'include',
-            })
+            });
 
-            if(response.ok){
-                const res = await response.json();   
-                console.log(res[0]);
-                                  
+            if (response.ok) {
+                const res = await response.json();
                 setComment(prevItems => [...prevItems, res[0]]);
-
+                setFormData({ content: '' }); // Clear input
             }
-        }catch(e){
+        } catch (e) {
             console.log(e);
-            
         }
-    }
+    };
 
-    useEffect(()=> {
-
+    useEffect(() => {
         const FetchPost = async () => {
-            try{
+            try {
                 const response = await fetch(`http://localhost:5000/posts/${id}`, {
                     method: "GET",
                     credentials: 'include'
                 });
 
-                if(response.ok){
-                    const data = await response.json();                                
-                    setPost(data[0]);                            
-                }else{
+                if (response.ok) {
+                    const data = await response.json();
+                    setPost(data[0]);
                 }
-            }catch(e){
+            } catch (e) {
                 console.log(e);
-                
             }
         };
 
         const FetchComment = async () => {
-            try{
+            try {
                 const response = await fetch(`http://localhost:5000/posts/${id}/comments`, {
                     method: "GET",
                     credentials: 'include'
                 });
 
-                if(response.ok){
-                    const data = await response.json(); 
-                    console.log(data);
-                                 
-                    setComment(data);                            
-                }else{
+                if (response.ok) {
+                    const data = await response.json();
+                    setComment(data);
                 }
-            }catch(e){
+            } catch (e) {
                 console.log(e);
-                
             }
-        }
+        };
         FetchPost();
         FetchComment();
-
-    },[]);
+    }, [id]);
 
     const handleClick = async (value, commentId, total_votes) => {
-        
-        let voteType="";
-        if(value > 0){
-            voteType="Like";
-        }else{
-            voteType="dislike";
-        }
-        try{
+        let voteType = value > 0 ? "Like" : "dislike";
+        try {
             const response = await fetch(`http://localhost:5000/posts/${id}/vote`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    voteType: voteType, 
-                    commentId: commentId ,
+                body: JSON.stringify({
+                    voteType: voteType,
+                    commentId: commentId,
                     total_votes: total_votes
-                }),                    
+                }),
                 credentials: 'include',
-            })
+            });
 
-            if(response.ok){
+            if (response.ok) {
                 const res = await response.json();
-                setComment(prevComments => 
-                prevComments.map(c => 
-                    c.id === commentId 
-                        ? { ...c, total_votes: Number(res) } 
-                        : c 
-                )
-            );
+                setComment(prevComments =>
+                    prevComments.map(c =>
+                        c.id === commentId
+                            ? { ...c, total_votes: Number(res) }
+                            : c
+                    )
+                );
             }
-        }catch(e){
+        } catch (e) {
             console.log(e);
-            
         }
-
-    }
+    };
 
     const handleClickPost = async (value, total_votes) => {
-        let voteType="";
-        if(value > 0){
-            voteType="Like";
-        }else{
-            voteType="dislike";
-        }
-        try{
+        let voteType = value > 0 ? "Like" : "dislike";
+        try {
             const response = await fetch(`http://localhost:5000/posts/${id}/Postvote`, {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    voteType: voteType, 
+                body: JSON.stringify({
+                    voteType: voteType,
                     total_votes: total_votes
-                }),                    
+                }),
                 credentials: 'include',
-            })
+            });
 
-            if(response.ok){
+            if (response.ok) {
                 const data = await response.json();
-                
-                
                 setPost(prevPost => ({
-                ...prevPost,
-                total_votes: Number(data)
-            }));
-                
+                    ...prevPost,
+                    total_votes: Number(data)
+                }));
             }
-        }catch(e){
+        } catch (e) {
             console.log(e);
-            
         }
-    }
+    };
 
     return (
-        <div>
-            <h1>Posts</h1>
-            
-            
-            <div key={post.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
-                
-                <h2>{post.title}</h2>
-                <p>{post.content}</p>
-                <Link to={`/user/${post.user_id}`}><p>{post.author_name}</p></Link>
-                <p>{post.total_votes}</p>
-                <button onClick={() => handleClickPost(1,post.total_votes)}>Upvote</button>
-                <button onClick={() => handleClickPost(-1, post.total_votes)}>Downvote</button>
-            </div>
-            
+        <div className="dashboard-container">
+            <Navbar />
 
-            {comment.map((comment) => (
+            <main className="dashboard-content">
+                <section className="main-feed">
+                    <header className="feed-header">
+                        <div className="feed-header-content">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: '1.2rem' }}>←</Link>
+                                <h2>Post</h2>
+                            </div>
+                        </div>
+                    </header>
 
-                <div key={comment.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
-                    <p>{comment.content}</p>
-                    <p>{comment.total_votes}</p>
-                    <Link to={`/user/${comment.user_id}`}><p>{comment.author_name}</p></Link>
+                    <div className="single-post-wrapper">
+                        {/* Main Post Section */}
+                        <div className="post-detail-container">
+                            <article className="post-main-card">
+                                <Link to={`/user/${post.user_id}`} className="post-detail-author">
+                                    {post.author_name}
+                                </Link>
+                                <h1 className="post-detail-title">{post.title}</h1>
+                                <p className="post-detail-content">{post.content}</p>
 
-                    <button onClick={() => handleClick(1,comment.id,comment.total_votes)}>Upvote</button>
-                    <button onClick={() => handleClick(-1, comment.id,comment.total_votes)}>Downvote</button>
-                </div>
-            ))}
+                                <div className="vote-section">
+                                    <div className="vote-controls">
+                                        <button className="vote-btn up" onClick={() => handleClickPost(1, post.total_votes)}>▲</button>
+                                        <span className="vote-count">{post.total_votes || 0}</span>
+                                        <button className="vote-btn down" onClick={() => handleClickPost(-1, post.total_votes)}>▼</button>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
 
-            <form onSubmit={createComment}>
-                <input name="content" 
-                    type="text" 
-                    className=''
-                    placeholder='content'
-                    onChange={handleChange}
-                />
+                        {/* Comments Section */}
+                        <div className="comments-container">
+                            <div className="comment-form-section">
+                                <form onSubmit={createComment} className="comment-form">
+                                    <div className="comment-input-wrapper">
+                                        <textarea
+                                            name="content"
+                                            className='comment-textarea'
+                                            placeholder='Post your reply'
+                                            value={formData.content}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <button type="submit" className="comment-submit-btn">Reply</button>
+                                    </div>
+                                </form>
+                            </div>
 
-                <button type="submit">comment!</button>
-            </form>
+                            <h3 className="comments-header">Replies</h3>
+
+                            <div className="comments-list">
+                                {comment.map((c) => (
+                                    <div key={c.id} className="comment-card">
+                                        <Link to={`/user/${c.user_id}`} className="comment-author">
+                                            {c.author_name}
+                                        </Link>
+                                        <p className="comment-content">{c.content}</p>
+                                        <div className="vote-controls">
+                                            <button className="vote-btn up" onClick={() => handleClick(1, c.id, c.total_votes)}>▲</button>
+                                            <span className="vote-count" style={{ fontSize: '0.9rem' }}>{c.total_votes || 0}</span>
+                                            <button className="vote-btn down" onClick={() => handleClick(-1, c.id, c.total_votes)}>▼</button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
         </div>
     );
-
-}
-
+};
 
 export default GetPost;

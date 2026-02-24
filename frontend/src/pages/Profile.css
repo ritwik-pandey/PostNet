@@ -1,0 +1,119 @@
+/* Profile.css */
+
+.profile-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Profile Header Section */
+.profile-banner {
+    height: 200px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 50%, #db2777 100%);
+    opacity: 0.8;
+}
+
+.profile-info-section {
+    padding: 0 30px 30px 30px;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-avatar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: -60px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #000;
+    border: 4px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.follow-btn {
+    padding: 10px 24px;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.follow-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.follow-btn.following {
+    background: #fff;
+    color: #000;
+}
+
+.profile-name-details h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.profile-handle {
+    color: #71767b;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    font-size: 0.95rem;
+    color: #71767b;
+}
+
+.stat-item span {
+    color: #fff;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+/* User Posts Feed */
+.profile-feed-header {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.user-posts-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-banner {
+        height: 150px;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+}

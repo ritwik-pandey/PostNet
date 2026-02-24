@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from './Navbar';
 import './AllPosts.css';
 
 const Posts = () => {
@@ -28,40 +29,34 @@ const Posts = () => {
         fetchPosts();
     }, []);
 
-    if (isLoading) {
-        return (
-            <div className="posts-page-container">
-                <div className="loading-container">
-                    <div className="spinner"></div>
-                    <p>Fetching the latest stories...</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="posts-page-container">
-            <header className="posts-header">
-                <h1>Community Feed</h1>
-                <p>Discover interesting thoughts and stories from around the world.</p>
-            </header>
+        <div className="dashboard-container">
+            <Navbar />
 
-            <div className="posts-grid">
-                {posts.map((post) => (
-                    <Link to={`/posts/${post.post_id}`} key={post.post_id} className="post-card-link">
-                        <article className="post-card">
-                            <h2>{post.title}</h2>
-                            <p className="post-content-preview">{post.content}</p>
-                            <div className="post-metadata">
-                                <div className="author-info">
-                                    <div className="author-avatar"></div>
-                                    <span className="author-name">{post.author_name || 'Anonymous'}</span>
+            <main className="dashboard-content">
+                <section className="main-feed">
+                    <header className="feed-header">
+                        <div className="feed-header-content">
+                            <h2>Community Feed</h2>
+                            <p className="feed-subtitle">Discover interesting thoughts and stories from around the world.</p>
+                        </div>
+                    </header>
+
+                    <div className="posts-list">
+                        {posts.map((post) => (
+                            <Link to={`/posts/${post.post_id}`} key={post.post_id} className="post-card">
+                                <div className="post-main-content">
+                                    <div className="post-header-info">
+                                        <span className="post-author-name">{post.author_name || 'Anonymous'}</span>
+                                    </div>
+                                    <div className="post-title-styled">{post.title}</div>
+                                    <div className="post-text-content">{post.content}</div>
                                 </div>
-                            </div>
-                        </article>
-                    </Link>
-                ))}
-            </div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
+            </main>
         </div>
     );
 }
