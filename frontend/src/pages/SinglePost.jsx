@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 const GetPost = () => {
     const [post,setPost] = useState([])
@@ -50,7 +50,7 @@ const GetPost = () => {
                 });
 
                 if(response.ok){
-                    const data = await response.json();                    
+                    const data = await response.json();                                
                     setPost(data[0]);                            
                 }else{
                 }
@@ -161,9 +161,10 @@ const GetPost = () => {
             
             
             <div key={post.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
+                
                 <h2>{post.title}</h2>
                 <p>{post.content}</p>
-                <p>{post.author_name}</p>
+                <Link to={`/user/${post.user_id}`}><p>{post.author_name}</p></Link>
                 <p>{post.total_votes}</p>
                 <button onClick={() => handleClickPost(1,post.total_votes)}>Upvote</button>
                 <button onClick={() => handleClickPost(-1, post.total_votes)}>Downvote</button>
@@ -175,6 +176,8 @@ const GetPost = () => {
                 <div key={comment.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
                     <p>{comment.content}</p>
                     <p>{comment.total_votes}</p>
+                    <Link to={`/user/${comment.user_id}`}><p>{comment.author_name}</p></Link>
+
                     <button onClick={() => handleClick(1,comment.id,comment.total_votes)}>Upvote</button>
                     <button onClick={() => handleClick(-1, comment.id,comment.total_votes)}>Downvote</button>
                 </div>

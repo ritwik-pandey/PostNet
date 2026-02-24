@@ -81,4 +81,24 @@ router.post('/user/:id/follow', authMiddleWare,async (req,res) => {
     
 })
 
+router.get('/', authMiddleWare, async (req,res) => {
+    const id = req.user.id;
+    const feedQuery = `
+  SELECT 
+    p.id, 
+    p.title, 
+    p.content, 
+    p.created_at,
+    u.name AS author_name
+  FROM posts p
+  JOIN follows f ON p.user_id = f.following_id
+  JOIN users u ON p.user_id = u.id
+  WHERE f.follower_id = $1
+  ORDER BY p.created_at DESC;
+`;
+    const responseData = await pool.query(feedQuery,[id]);
+    res.send(responseData.rows);
+    
+})
+
 module.exports = router;
