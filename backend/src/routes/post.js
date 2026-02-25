@@ -2,8 +2,9 @@ const express = require('express')
 const pool = require('../db/db')
 const router = express.Router();
 const authMiddleWare = require('../middleware/auth')
+const rateLimitPost = require('../middleware/rateLimiter')
 
-router.post('/create-post', authMiddleWare, async (req,res)=>{
+router.post('/create-post', authMiddleWare,rateLimitPost, async (req,res)=>{
     const id = req.user.id;
     const title = req.body.title;
     const content = req.body.content;
