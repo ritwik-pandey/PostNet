@@ -1,33 +1,64 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 import Navbar from './Navbar';
 import './AllPosts.css';
 
 const Posts = () => {
     const [posts, setPosts] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [offset, setOffset] = useState(0)
+    const [hasMore, sethasMore] = useState(true)
+    const LIMIT = 5;
+    const loaderRef = useRef(null);
 
     useEffect(() => {
         const fetchPosts = async () => {
+            if (!hasMore) return;
             try {
-                const response = await fetch('http://localhost:5000/posts', {
+                setLoading(true);
+
+                const response = await fetch(`http://localhost:5000/posts?limit=${LIMIT}&offset=${offset}`, {
                     method: "GET",
                     credentials: 'include',
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    setPosts(data);
+                    const data = await response.json(); 
+                    setPosts(prev => [...prev, ...data.posts]);                   
+                    sethasMore(data.hasMore);
+                    
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
-                setIsLoading(false);
+                setLoading(false);
             }
         };
 
         fetchPosts();
-    }, []);
+    }, [offset]);
+
+    useEffect(() => {
+        if (!hasMore) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !loading) {
+                    setOffset(prev => prev + LIMIT);
+                }
+            },
+            { threshold: 1 }
+        );
+
+        const current = loaderRef.current;
+
+        if (current) observer.observe(current);
+
+        return () => {
+            if (current) observer.unobserve(current);
+        };
+    },  [loading,hasMore]);
 
     return (
         <div className="dashboard-container">
@@ -55,8 +86,10 @@ const Posts = () => {
                             </Link>
                         ))}
                     </div>
+                    {hasMore && <div ref={loaderRef} style={{ height: "40px" }} />}
                 </section>
             </main>
+
         </div>
     );
 }

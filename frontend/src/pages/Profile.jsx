@@ -132,10 +132,10 @@ const GetProfile = () => {
                                 </div>
                                 {userData.Self === false && (
                                     <button
-                                        className={`follow-btn ${userData.follows === 1 ? 'following' : ''}`}
+                                        className={`follow-btn ${userData.follows == 1 ? 'following' : ''}`}
                                         onClick={handleFollowToggle}
                                     >
-                                        {userData.follows === 1 ? 'Following' : 'Follow'}
+                                        {userData.follows == 1 ? 'Following' : 'Follow'}
                                     </button>
                                 )}
                             </div>

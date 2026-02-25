@@ -23,7 +23,7 @@ router.get('/user/:id', authMiddleWare, async (req,res) => {
         jsonData["Self"] = true;
     }else{
         jsonData["Self"] = false;
-    }    
+    }        
     res.send(jsonData);
 })
 
@@ -83,6 +83,9 @@ router.post('/user/:id/follow', authMiddleWare,async (req,res) => {
 
 router.get('/', authMiddleWare, async (req,res) => {
     const id = req.user.id;
+    const { limit, offset } = req.query;
+        
+    const queryLimit = Number(limit) + 1; 
     const feedQuery = `
   SELECT 
     p.id, 
@@ -94,10 +97,21 @@ router.get('/', authMiddleWare, async (req,res) => {
   JOIN follows f ON p.user_id = f.following_id
   JOIN users u ON p.user_id = u.id
   WHERE f.follower_id = $1
-  ORDER BY p.created_at DESC;
+  ORDER BY p.created_at DESC
+          LIMIT $2 OFFSET $3;
 `;
-    const responseData = await pool.query(feedQuery,[id]);
-    res.send(responseData.rows);
+    const responseData = await pool.query(feedQuery,[id,queryLimit,offset]);
+    let posts = responseData.rows;
+        
+    let hasMore = false;
+    if (posts.length > limit) {
+        hasMore = true;
+        posts.pop(); 
+    }        
+    res.json({
+        posts: posts,
+        hasMore: hasMore
+    });
     
 })
 

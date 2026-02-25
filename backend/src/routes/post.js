@@ -27,23 +27,35 @@ router.post('/create-post', authMiddleWare, async (req,res)=>{
 
 router.get('/posts', authMiddleWare, async (req,res) => {
     try{
+        const { limit, offset } = req.query;
+        
+        const queryLimit = Number(limit) + 1; 
+
         const query = `
-            SELECT 
-                posts.id AS post_id, 
-                posts.title, 
-                posts.content, 
-                users.name AS author_name,
-                user_id
-            FROM posts
-            JOIN users ON posts.user_id = users.id
-            ORDER BY posts.id DESC;
+        SELECT 
+            posts.id AS post_id, 
+            posts.title, 
+            posts.content, 
+            users.name AS author_name,
+            user_id
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+        ORDER BY posts.created_at DESC
+        LIMIT $1 OFFSET $2;
         `;
-        const responseData = await pool.query(query);
+
+        const responseData = await pool.query(query, [queryLimit, Number(offset)]);
+        let posts = responseData.rows;
         
-        
-        const jsonContent = JSON.stringify(responseData.rows);
-        
-        res.end(jsonContent);
+        let hasMore = false;
+        if (posts.length > limit) {
+            hasMore = true;
+            posts.pop(); 
+        }        
+        res.json({
+            posts: posts,
+            hasMore: hasMore
+        });
     }catch(err){
         console.log(err);
     }

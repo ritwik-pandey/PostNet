@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import './Dashboard.css';
@@ -6,21 +6,34 @@ import './Dashboard.css';
 const Dashboard = () => {
     const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [offset, setOffset] = useState(0)
+    const [hasMore, sethasMore] = useState(true)
+    const LIMIT = 5;
+    const loaderRef = useRef(null);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/', {
+                if (!hasMore) return;
+                setLoading(true);
+
+                const response = await fetch(`http://localhost:5000?limit=${LIMIT}&offset=${offset}`, {
                     method: "GET",
                     credentials: 'include',
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    setPosts(data);
+                    setPosts(prev => [...prev, ...data.posts]); 
+                                      
+                    sethasMore(data.hasMore);
+
                 } else {
                     navigate('/login', { replace: true });
                 }
+                setLoading(false);
+
             } catch (error) {
                 console.error("Error fetching data:", error);
                 navigate('/login', { replace: true });
@@ -28,7 +41,28 @@ const Dashboard = () => {
         };
 
         fetchDashboardData();
-    }, [navigate]);
+    }, [navigate,offset]);
+
+    useEffect(() => {
+        if (!hasMore) return;
+    
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !loading) {
+                    setOffset(prev => prev + LIMIT);
+                }
+            },
+            { threshold: 1 }
+        );
+    
+        const current = loaderRef.current;
+
+        if (current) observer.observe(current);
+    
+        return () => {
+            if (current) observer.unobserve(current);
+        };
+    },  [loading,hasMore]);
 
     return (
         <div className="dashboard-container">
@@ -55,6 +89,8 @@ const Dashboard = () => {
                             </Link>
                         ))}
                     </div>
+                    {hasMore && <div ref={loaderRef} style={{ height: "40px" }} />}
+
                 </section>
             </main>
         </div>

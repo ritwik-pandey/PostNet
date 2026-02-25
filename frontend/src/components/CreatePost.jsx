@@ -48,7 +48,7 @@ const CreatePost = () => {
                     <div className="create-post-wrapper">
                         <div className="create-post-form-card">
                             <p className="create-post-subtitle">Share your thoughts with the world</p>
-
+Community Feed
                             <form onSubmit={createPost} className="create-post-form">
                                 <div className="input-group-styled">
                                     <label className="input-label">Title</label>
