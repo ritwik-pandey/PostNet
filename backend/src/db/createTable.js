@@ -17,6 +17,7 @@ const createPostTable = `
     title VARCHAR(100) NOT NULL,
     content VARCHAR(100) NOT NULL,
     user_id INT REFERENCES users(id),
+    is_deleted BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL DEFAULT current_timestamp
   );
 `;

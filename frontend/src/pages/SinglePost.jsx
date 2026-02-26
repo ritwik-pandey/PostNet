@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import './SinglePost.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const GetPost = () => {
+    const navigate = useNavigate();
+
     const [post, setPost] = useState([]);
     const [comment, setComment] = useState([]);
     const { id } = useParams();
@@ -29,7 +33,7 @@ const GetPost = () => {
             if (response.ok) {
                 const res = await response.json();
                 setComment(prevItems => [...prevItems, res[0]]);
-                setFormData({ content: '' }); // Clear input
+                setFormData({ content: '' });
             }
         } catch (e) {
             console.log(e);
@@ -62,6 +66,8 @@ const GetPost = () => {
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data);
+
                     setComment(data);
                 }
             } catch (e) {
@@ -126,6 +132,38 @@ const GetPost = () => {
         }
     };
 
+    const deletePost = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/posts/${id}/delete`, {
+                method: "GET",
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                navigate('/');
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const deleteComment = async (commentId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/comments/${id}/delete/${commentId}`, {
+                method: "GET",
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                setComment((prevComments) =>
+                    prevComments.filter((c) => c.id !== commentId)
+                );
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
         <div className="dashboard-container">
             <Navbar />
@@ -157,6 +195,7 @@ const GetPost = () => {
                                         <span className="vote-count">{post.total_votes || 0}</span>
                                         <button className="vote-btn down" onClick={() => handleClickPost(-1, post.total_votes)}>▼</button>
                                     </div>
+                                    {post.is_owner && (<button className="delete-btn" onClick={deletePost}>Delete</button>)}
                                 </div>
                             </article>
                         </div>
@@ -188,6 +227,8 @@ const GetPost = () => {
                                             {c.author_name}
                                         </Link>
                                         <p className="comment-content">{c.content}</p>
+                                        {c.is_owner && (<button className="delete-btn" onClick={() => deleteComment(c.id)}>Delete</button>)}
+
                                         <div className="vote-controls">
                                             <button className="vote-btn up" onClick={() => handleClick(1, c.id, c.total_votes)}>▲</button>
                                             <span className="vote-count" style={{ fontSize: '0.9rem' }}>{c.total_votes || 0}</span>

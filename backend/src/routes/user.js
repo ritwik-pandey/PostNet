@@ -32,9 +32,8 @@ router.get('/user/:id/posts', authMiddleWare, async (req,res) => {
     const query=`
         SELECT *
         FROM posts
-        WHERE user_id = $1;
+        WHERE user_id = $1 AND posts.is_deleted=false;
     `
-
     const responseData = await pool.query(query,[id]);
     res.send(responseData.rows);
     
@@ -96,7 +95,7 @@ router.get('/', authMiddleWare, async (req,res) => {
   FROM posts p
   JOIN follows f ON p.user_id = f.following_id
   JOIN users u ON p.user_id = u.id
-  WHERE f.follower_id = $1
+  WHERE f.follower_id = $1 AND p.is_deleted=false
   ORDER BY p.created_at DESC
           LIMIT $2 OFFSET $3;
 `;

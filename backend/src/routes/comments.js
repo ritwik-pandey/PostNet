@@ -35,11 +35,12 @@ router.get('/posts/:id/comments', authMiddleWare, async (req,res)=>{
                 SELECT COALESCE(SUM(vote_type), 0) 
                 FROM commentsvotes 
                 WHERE commentsvotes.comment_id = comments.id
-            ) AS total_votes
+            ) AS total_votes,
+            (comments.user_id=$1) AS is_owner
             FROM comments
             JOIN users ON comments.user_id = users.id
-            WHERE comments.post_id = ${post_id};`
-        const responseData = await pool.query(query)
+            WHERE comments.post_id = $2;`
+        const responseData = await pool.query(query,[req.user.id,post_id])
         const jsonContent = JSON.stringify(responseData.rows);        
         res.end(jsonContent);
     }catch(e){
@@ -137,5 +138,21 @@ router.post('/posts/:id/Postvote', authMiddleWare, async (req,res)=>{
     }
     
     res.end(total_votes.toString());
+})
+
+router.get('/comments/:id/delete/:commentId', async (req,res) => {
+    const deleteVotesQuery = `
+        DELETE FROM commentsvotes 
+        WHERE comment_id = $1;
+        `;
+    await pool.query(deleteVotesQuery, [req.params.commentId]);
+
+    const deleteCommentQuery = `
+        DELETE FROM comments 
+        WHERE post_id = $1 AND id = $2;
+        `;
+    await pool.query(deleteCommentQuery, [req.params.id, req.params.commentId]);
+
+    res.status(200).send();
 })
 module.exports = router;
