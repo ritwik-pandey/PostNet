@@ -136,6 +136,40 @@ router.get('/posts/:id/delete', authMiddleWare, async (req, res) => {
     }
 });
 
+router.get('/', authMiddleWare, async (req,res) => {
+    const id = req.user.id;
+    const { limit, offset } = req.query;
+        
+    const queryLimit = Number(limit) + 1; 
+    const feedQuery = `
+  SELECT 
+    p.id, 
+    p.title, 
+    p.content, 
+    p.created_at,
+    u.name AS author_name
+  FROM posts p
+  JOIN follows f ON p.user_id = f.following_id
+  JOIN users u ON p.user_id = u.id
+  WHERE f.follower_id = $1 AND p.is_deleted=false
+  ORDER BY p.created_at DESC
+          LIMIT $2 OFFSET $3;
+`;
+    const responseData = await pool.query(feedQuery,[id,queryLimit,offset]);
+    let posts = responseData.rows;
+        
+    let hasMore = false;
+    if (posts.length > limit) {
+        hasMore = true;
+        posts.pop(); 
+    }        
+    res.json({
+        posts: posts,
+        hasMore: hasMore
+    });
+    
+})
+
 
 
 module.exports = router;
